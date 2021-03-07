@@ -40,7 +40,7 @@ def get_face(name: str, num: int):
 
         cv2.imshow('face', image)
         key = cv2.waitKey(10)
-        if key & 0xFF == ord(' '):
+        if key & 0xFF == 27:
             break
 
     cap.release()
@@ -49,6 +49,6 @@ def get_face(name: str, num: int):
 
 if __name__ == '__main__':
     try:
-        get_face('mamingda', 200)
+        get_face('wuhuixin', 200)
     except Exception as e:
         print(e)

@@ -36,7 +36,7 @@ def test():
     resnet = InceptionResnetV1(pretrained='vggface2').eval().to(device)
 
     # 加载训练好的KNN分类器模型
-    # knn = joblib.load('knn_model.pkl')
+    knn = joblib.load('knn_model.pkl')
 
     # 初始化视频窗口
     windows_name = 'face'
@@ -54,7 +54,7 @@ def test():
         if boxes is not None:
             for box, prob in zip(boxes, probs):
                 # 设置人脸检测阈值
-                if prob < 0.85:
+                if prob < 0.7:
                     continue
 
                 x1, y1, x2, y2 = [int(p) for p in box]
@@ -67,23 +67,22 @@ def test():
                 # 生成512维特征向量
                 embeddings = resnet(face).detach().cpu().numpy()
                 # KNN预测
-                # name = knn.predict(embeddings)
-                # prop = knn.predict_proba(embeddings)
+                name_knn = knn.predict(embeddings)
 
                 # 获得预测姓名和距离
-                name, dis = recognize(embeddings)
-                # 如果距离大于0.99则识别失败
-                if dis > 1.0:
-                    name = 'unknown'
+                _, dis = recognize(embeddings)
+                # 如果距离过大则认为识别失败
+                if dis > 1.03:
+                    name_knn = 'unknown'
                 # 将识别出的名字和距离显示在图像上
-                cv2.putText(image, f'{name}({round(dis, 2)})', (x1 - 20, y1 - 20), cv2.FONT_ITALIC, 1, (255, 0, 255), 4)
+                cv2.putText(image, f'{name_knn[0]}({round(dis, 2)})', (x1 - 20, y1 - 20), cv2.FONT_ITALIC, 1, (255, 0, 255), 4)
 
         # 显示处理后的图片
         cv2.imshow(windows_name, image)
 
         # 保持窗口
         key = cv2.waitKey(1)
-        if key & 0xff == ord(' '):
+        if key & 0xff == 27:
             break
 
     # 释放设备资源，销毁窗口

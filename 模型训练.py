@@ -54,20 +54,11 @@ a.reset_index(inplace=True)
 a.columns = ['label'] + [f'v{i}' for i in range(512)]
 a.to_csv('face_data.csv', index=False)
 
-exit(0)
-print(embeddings)
 
-# dists = [[(e1 - e2).norm().item() for e2 in embeddings] for e1 in embeddings]
-# cor = pd.DataFrame(dists, columns=names, index=names)
-# print(cor)
-# cor.to_csv('a.csv')
+x = a.drop(columns=['label'])
+y = a['label']
+knn = KNN(n_neighbors=5)
+knn.fit(x, y)
+joblib.dump(knn, 'knn_model.pkl')
+print('导出模型')
 
-# data = pd.read_csv('face_data.csv')
-# x = data.drop(columns=['label'])
-# y = data['label']
-# knn = KNN(n_neighbors=5)
-# knn.fit(x, y)
-#
-# joblib.dump(knn, 'knn_model.pkl')
-#
-# print(knn.predict([x.iloc[0]]))
