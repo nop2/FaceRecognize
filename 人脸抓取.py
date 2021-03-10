@@ -32,7 +32,7 @@ def get_face(name: str, num: int):
                 if count >= num:
                     break
 
-                cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.rectangle(image, (x, y), (x + w, y + h - 10), (0, 255, 0), 2)
                 cv2.putText(image, f'Count:{count}', (x + 30, y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 4)
 
         if count >= num:
@@ -49,6 +49,6 @@ def get_face(name: str, num: int):
 
 if __name__ == '__main__':
     try:
-        get_face('wuhuixin', 200)
+        get_face('test', 1000)
     except Exception as e:
         print(e)

@@ -43,6 +43,7 @@ def test():
     cv2.namedWindow(windows_name)
     cap = cv2.VideoCapture(0)
 
+    count = 0
     while True:
         # 从摄像头读取一帧图像
         success, image = cap.read()
@@ -54,7 +55,7 @@ def test():
         if boxes is not None:
             for box, prob in zip(boxes, probs):
                 # 设置人脸检测阈值
-                if prob < 0.7:
+                if prob < 0.9:
                     continue
 
                 x1, y1, x2, y2 = [int(p) for p in box]
@@ -72,10 +73,12 @@ def test():
                 # 获得预测姓名和距离
                 _, dis = recognize(embeddings)
                 # 如果距离过大则认为识别失败
-                if dis > 1.03:
-                    name_knn = 'unknown'
-                # 将识别出的名字和距离显示在图像上
-                cv2.putText(image, f'{name_knn[0]}({round(dis, 2)})', (x1 - 20, y1 - 20), cv2.FONT_ITALIC, 1, (255, 0, 255), 4)
+                if dis > 0.9:
+                    cv2.putText(image, f'unknown', (x1 - 20, y1 - 20), cv2.FONT_ITALIC, 1, (255, 0, 255), 4)
+                else:
+                    # 将识别出的名字和距离显示在图像上
+                    cv2.putText(image, f'{name_knn[0]}({round(dis, 2)})', (x1 - 20, y1 - 20),
+                                cv2.FONT_ITALIC, 1, (255, 0, 255), 4)
 
         # 显示处理后的图片
         cv2.imshow(windows_name, image)
