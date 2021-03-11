@@ -14,21 +14,21 @@ from PIL import Image, ImageDraw, ImageFont
 # 人脸识别器
 class FaceRecognizer:
     # 初始化，加载数据
-    def __init__(self):
+    def __init__(self, knn_model_path='knn_model.pkl', face_feature_path='face_feature.csv'):
         # 选择设备
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         print('Running on device: {}'.format(self.device))
 
         # 读取训练好的人脸特征数据
-        self.data = pd.read_csv('face_feature.csv')
+        self.data = pd.read_csv(face_feature_path)
         self.x = self.data.drop(columns=['label'])
         self.y = self.data['label']
 
+        # 加载训练好的KNN分类器模型
+        self.knn_model = joblib.load(knn_model_path)
+
         # 字体文件，用于在图片上正确显示中文
         self.font = ImageFont.truetype('simsun.ttc', size=30)
-
-        # 加载训练好的KNN分类器模型
-        self.knn_model = joblib.load('knn_model.pkl')
 
     # 根据特征向量识别人脸，使用欧氏距离，如果距离大于1则认为识别失败
     # 这里与KNN模型功能重复，只是想要计算一个最小距离，略微影响识别性能
