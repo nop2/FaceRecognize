@@ -59,11 +59,13 @@ def train(path):
 
 
 if __name__ == '__main__':
+    # 放一起训练会爆显存，故分开
     face_data = pd.concat([train(r'F:\Code\Python\人脸识别\计科四班人脸数据库\Part1'),
                            train(r'F:\Code\Python\人脸识别\计科四班人脸数据库\Part2')])
 
     face_data.to_csv('face_feature.csv', index=False, encoding='utf8')
 
+    # 训练KNN模型
     x = face_data.drop(columns=['label'])
     y = face_data['label']
     knn = KNN(n_neighbors=5)

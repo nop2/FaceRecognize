@@ -1,3 +1,7 @@
+'''
+WHX 2021.03.11
+'''
+
 import cv2
 import joblib
 import numpy as np
@@ -27,6 +31,7 @@ class FaceRecognizer:
         self.knn_model = joblib.load('knn_model.pkl')
 
     # 根据特征向量识别人脸，使用欧氏距离，如果距离大于1则认为识别失败
+    # 这里与KNN模型功能重复，只是想要计算一个最小距离，略微影响识别性能
     def _recognize(self, v):
         dis = np.sqrt(sum((v[0] - self.x.iloc[0]) ** 2))
         name = self.y[0]
@@ -57,10 +62,10 @@ class FaceRecognizer:
             if not success:
                 break
 
-            img = Image.fromarray(image)
-            draw = ImageDraw.Draw(img)
+            img_PIL = Image.fromarray(image)
+            draw = ImageDraw.Draw(img_PIL)
 
-            # 检测人脸位置
+            # 检测人脸位置,获得人脸框坐标和人脸概率
             boxes, probs = mtcnn.detect(image)
             if boxes is not None:
                 for box, prob in zip(boxes, probs):
@@ -85,21 +90,22 @@ class FaceRecognizer:
                     _, dis = self._recognize(embeddings)
                     # 如果距离过大则认为识别失败
                     if dis > 0.9:
-                        # 框出人脸位置并写上名字
                         draw.rectangle((x1, y1, x2, y2), outline=(0, 0, 255), width=2)
                         draw.text((x1, y1 - 40), f'未知', font=self.font, fill=(0, 0, 255))
                         # cv2.putText(image, 'unknown', (x1 - 20, y1 - 20), cv2.FONT_ITALIC, 1, (255, 0, 255), 4)
                     else:
+                        # 框出人脸位置并写上名字
                         draw.rectangle((x1, y1, x2, y2), outline=(0, 255, 0), width=2)
                         draw.text((x1, y1 - 40), f'{name_knn[0]}({round(dis, 2)})', font=self.font, fill=(0, 255, 0))
                         # cv2.putText(image, f'{name_knn[0]}({round(dis, 2)})', (x1 - 20, y1 - 20),
                         #             cv2.FONT_ITALIC, 1, (255, 0, 255), 4)
 
             # 显示处理后的图片
-            cv2.imshow(windows_name, np.array(img))
+            cv2.imshow(windows_name, np.array(img_PIL))
 
             # 保持窗口
             key = cv2.waitKey(1)
+            # ESC键退出
             if key & 0xff == 27:
                 break
 
