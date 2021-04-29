@@ -27,7 +27,7 @@ def collate_fn(x):
 def train(path):
     dataset = datasets.ImageFolder(path)
     dataset.idx_to_class = {i: c for c, i in dataset.class_to_idx.items()}
-    loader = DataLoader(dataset, collate_fn=collate_fn, num_workers=0, batch_size=2)
+    loader = DataLoader(dataset, collate_fn=collate_fn, num_workers=0, batch_size=1)
 
     print(dataset.idx_to_class)
 
@@ -60,8 +60,12 @@ def train(path):
 
 if __name__ == '__main__':
     # 放一起训练会爆显存，故分开
-    face_data = pd.concat([train(r'F:\Code\Python\人脸识别\计科四班人脸数据库\Part1'),
-                           train(r'F:\Code\Python\人脸识别\计科四班人脸数据库\Part2')])
+    face_data = pd.concat([
+        train(r'F:\Code\Python\人脸识别\计科四班人脸数据库\Part1'),
+        train(r'F:\Code\Python\人脸识别\计科四班人脸数据库\Part2'),
+        train(r'F:\Code\Python\人脸识别\计科四班人脸数据库\Part3'),
+        train(r'F:\Code\Python\人脸识别\计科四班人脸数据库\Part4')
+    ])
 
     face_data.to_csv('face_feature.csv', index=False, encoding='utf8')
 
